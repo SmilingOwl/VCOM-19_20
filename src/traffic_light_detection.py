@@ -33,7 +33,7 @@ def find_circle(img, img_to_show, color):
 def main():
     # Get image from arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--image", required = False, help = "Path to the image")
+    ap.add_argument("-i", "--image", required = True, help = "Path to the image")
     args = vars(ap.parse_args())
 
     # Read image
