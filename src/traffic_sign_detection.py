@@ -3,14 +3,15 @@ import argparse
 import numpy as np
 
 def find_circle(img, img_to_show, color):
+    
     # Obtain black/white image with the wanted colors, according to the string received in color
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     if color == "red":
-        img_red1 = cv2.inRange(img_hsv, (0, 120, 70), (10, 255, 255))
-        img_red2 = cv2.inRange(img_hsv, (170, 120, 70), (180, 255, 255))
+        img_red1 = cv2.inRange(img_hsv, (0, 70, 70), (10, 255, 255))
+        img_red2 = cv2.inRange(img_hsv, (170, 70, 70), (180, 255, 255))
         img_color = img_red1 + img_red2
     else:
-        img_color = cv2.inRange(img_hsv, (100, 150, 0), (140, 255, 255))
+        img_color = cv2.inRange(img_hsv, (100, 70, 70), (140, 255, 255))
 
     # Apply Canny Edge Detector to obtain edges, blur image and obtain circles through HoughCircles
     img_canny = cv2.Canny(img_color, 100, 200)
