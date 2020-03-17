@@ -11,7 +11,7 @@ def find_circle(img, img_to_show, color):
         img_red2 = cv2.inRange(img_hsv, (170, 70, 70), (180, 255, 255))
         img_color = img_red1 + img_red2
     else:
-        img_color = cv2.inRange(img_hsv, (100, 70, 70), (140, 255, 255))
+        img_color = cv2.inRange(img_hsv, (100, 70, 0), (140, 255, 255))
 
     # Apply Canny Edge Detector to obtain edges, blur image and obtain circles through HoughCircles
     img_canny = cv2.Canny(img_color, 100, 200)
@@ -22,14 +22,22 @@ def find_circle(img, img_to_show, color):
     max_radius = -1
     if circles is not None:
         circles = np.round(circles[0, :]).astype("int")
+        #while circles is Not None
         for (x, y, r) in circles:
             if r > max_radius:
                 circle_x = x
                 circle_y = y
                 max_radius = r
+            #circles.remove((circle_x, circle_y, max_radius))
+
+            #cv2.circle(img_to_show, (circle_x, circle_y), max_radius, (0, 255, 0), 4)
+            #print(color + " circle")
     if max_radius > -1:
         cv2.circle(img_to_show, (circle_x, circle_y), max_radius, (0, 255, 0), 4)
         print(color + " circle")
+
+#def check_intersection_circles(circles, circle_x, circle_y, max_radius):
+
 
 def main():
     # Get image from arguments
