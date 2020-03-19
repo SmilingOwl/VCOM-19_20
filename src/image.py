@@ -1,7 +1,5 @@
 import cv2
 
-# Returns image from camera when Space is pressed, or None when Esc is pressed
-
 def CaptureCameraImage():
     cap = cv2.VideoCapture(0)
     img = None
