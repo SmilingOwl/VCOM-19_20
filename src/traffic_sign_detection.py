@@ -34,6 +34,7 @@ def find_circle(img, img_to_show, color):
         for (x, y, r) in circles:
             cv2.circle(img_to_show, (x, y), r, (0, 255, 0), 4)
             print(color + " circle")
+            cv2.putText(img_to_show, color + " cirlce", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 
 def find_triangle(image, img_to_show):
     """
@@ -105,7 +106,7 @@ def find_triangle(image, img_to_show):
                 c = c.astype("float")
                 c =  c.astype("int")
                 cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
-                #cv2.putText(image, "triangle", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+                cv2.putText(img_to_show, "triangle", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 
             #cv2.imshow("Image", image)
             #cv2.waitKey(0)
@@ -142,4 +143,4 @@ def find_square(image, img_to_show):
                 c = c.astype("float")
                 c =  c.astype("int")
                 cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
-                #cv2.putText(image, "square", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+                cv2.putText(img_to_show, "square", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
