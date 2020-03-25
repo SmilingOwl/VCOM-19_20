@@ -33,7 +33,7 @@ def find_circle(img, img_to_show, color):
         circles = np.round(circles[0, :]).astype("int")
         for (x, y, r) in circles:
             cv2.circle(img_to_show, (x, y), r, (0, 255, 0), 4)
-            print(color + " circle")
+            #print(color + " circle")
             cv2.putText(img_to_show, color + " cirlce", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 
 def find_triangle(image, img_to_show):
@@ -100,7 +100,7 @@ def find_triangle(image, img_to_show):
             peri = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.04 * peri, True)
             if len(approx) == 3:
-                print("red triangle")
+                #print("red triangle")
             
             # multiply the contour (x, y)-coordinates by the resize ratio
                 c = c.astype("float")
@@ -137,7 +137,7 @@ def find_square(image, img_to_show):
             peri = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.02 * peri, True)
             if len(approx) == 4:
-                print("blue square / rectangle")
+                #print("blue square / rectangle")
             
             # multiply the contour (x, y)-coordinates by the resize ratio
                 c = c.astype("float")
