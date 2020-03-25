@@ -25,7 +25,6 @@ def find_circle(img, img_to_show, color):
     
     img_canny = cv2.Canny(img_color, 100, 200)
     img_blur = cv2.GaussianBlur(img_canny, (5, 5), 0)
-    cv2.imshow("Blur", img_blur)
     circles = cv2.HoughCircles(img_blur, cv2.HOUGH_GRADIENT, 1.5, img_blur.shape[0] / 8, param1=200, param2=100, minRadius=0, maxRadius=0)
 
     # Obtain biggest circle
