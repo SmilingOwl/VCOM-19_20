@@ -1,6 +1,5 @@
 import sys
 import cv2
-import image
 import argparse
 import numpy as np
 import traffic_sign_detection as traffic
@@ -14,23 +13,32 @@ args = parser.parse_args()
 arg = args.method
 
 if arg == 'camera':
-    img = image.CaptureCameraImage()
+    cap = cv2.VideoCapture(0)
+    img = None
+    while(True):
+        ret, frame = cap.read()
+        frame_to_show = frame.copy()
+        traffic.find_shapes(frame, frame)
+        cv2.imshow('Image', frame)
+        key = cv2.waitKey(1)
+        esc_key = 27
+        if key == esc_key:
+            break
+    cap.release()
+    cv2.destroyAllWindows()
 
 elif arg == 'file':
     print('Opening image ' + args.path)
-    img = image.ReadImageFile(args.path)
+    img = cv2.imread(args.path)
+    if img is None:
+        print('Image not found')
+        quit()
     img_to_show = img.copy()
 
     # Find circle
-    traffic.find_circle(img, img_to_show, "red")
-    traffic.find_circle(img, img_to_show, "blue")
+    traffic.find_shapes(img, img_to_show)
 
     # Show result
-    cv2.imshow('Circle', img_to_show)
+    cv2.imshow('Image', img_to_show)
     cv2.waitKey(0) # so that the window doesn't close right away
     cv2.destroyAllWindows() # to destroy all open windows
-
-if img is None:
-    print('Image not found')
-    quit()
-
