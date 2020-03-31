@@ -8,7 +8,7 @@ import traffic_sign_detection as traffic
 
 def find_shapes(img, img_to_show):
     find_circle(img, img_to_show, "red")
-    find_circle(img, img_to_show, "blue")
+    #find_circle(img, img_to_show, "blue")
     find_triangle(img, img_to_show)
     find_square(img, img_to_show)
 
@@ -22,10 +22,15 @@ def find_circle(img, img_to_show, color):
         img_color = img_red1 + img_red2
     else:
         img_color = cv2.inRange(img_hsv, (100, 150, 0), (140, 255, 255))
+
+    result_color = cv2.bitwise_and(img, img, mask=img_color)
+    img_gray = cv2.cvtColor(result_color, cv2.COLOR_BGR2GRAY)
+    img_gray = cv2.medianBlur(img_gray, 5)
+    cv2.imshow('Gray', img_gray)
     
-    img_canny = cv2.Canny(img_color, 100, 200)
-    img_blur = cv2.GaussianBlur(img_canny, (5, 5), 0)
-    circles = cv2.HoughCircles(img_blur, cv2.HOUGH_GRADIENT, 1.5, img_blur.shape[0] / 8, param1=200, param2=100, minRadius=0, maxRadius=0)
+    #img_canny = cv2.Canny(img_color, 100, 200)
+    #img_blur = cv2.GaussianBlur(img_canny, (5, 5), 0)
+    circles = cv2.HoughCircles(img_gray, cv2.HOUGH_GRADIENT, 1, img.shape[0] / 8, param1=50, param2=80, minRadius=0, maxRadius=0)
 
     # Obtain biggest circle
     max_radius = -1
@@ -99,17 +104,17 @@ def find_triangle(image, img_to_show):
             cY = int((M["m01"] / M["m00"]))
             peri = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.04 * peri, True)
-            if len(approx) == 3:
-                #print("red triangle")
-            
+            if len(approx) == 3:            
             # multiply the contour (x, y)-coordinates by the resize ratio
                 c = c.astype("float")
-                c =  c.astype("int")
+                c = c.astype("int")
                 cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
                 cv2.putText(img_to_show, "triangle", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
-
-            #cv2.imshow("Image", image)
-            #cv2.waitKey(0)
+            if len(approx) == 8:
+                c = c.astype("float")
+                c = c.astype("int")
+                cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
+                cv2.putText(img_to_show, "STOP", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
             
 def find_square(image, img_to_show):
 
@@ -137,9 +142,6 @@ def find_square(image, img_to_show):
             peri = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.02 * peri, True)
             if len(approx) == 4:
-                #print("blue square / rectangle")
-            
-            # multiply the contour (x, y)-coordinates by the resize ratio
                 c = c.astype("float")
                 c =  c.astype("int")
                 cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)

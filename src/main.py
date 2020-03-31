@@ -35,7 +35,7 @@ elif arg == 'file':
         quit()
     img_to_show = img.copy()
 
-    # Find circle
+    # Find shapes
     traffic.find_shapes(img, img_to_show)
 
     # Show result
