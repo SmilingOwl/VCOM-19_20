@@ -21,7 +21,7 @@ def find_circle(img, img_to_show, color):
         img_red2 = cv2.inRange(img_hsv, (170, 90, 70), (180, 255, 255))
         img_color = img_red1 + img_red2
     else:
-        img_color = cv2.inRange(img_hsv, (100, 150, 0), (140, 255, 255))
+        img_color = cv2.inRange(img_hsv, (100, 150, 70), (140, 255, 255))
 
     result_color = cv2.bitwise_and(img, img, mask=img_color)
     img_gray = cv2.cvtColor(result_color, cv2.COLOR_BGR2GRAY)
@@ -90,7 +90,7 @@ def find_square(image, img_to_show):
    
     # converting to HSV color space
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
-    img_blue = cv2.inRange(hsv, (100, 123, 0), (140, 255, 255))
+    img_blue = cv2.inRange(hsv, (100, 120, 70), (140, 255, 255))
     result_blue = cv2.bitwise_and(image, image, mask=img_blue)
 
     gray = cv2.cvtColor(result_blue, cv2.COLOR_BGR2GRAY)
