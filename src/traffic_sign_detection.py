@@ -33,7 +33,7 @@ def find_circle(img, img_to_show, color):
         circles = np.round(circles[0, :]).astype("int")
         for (x, y, r) in circles:
             cv2.circle(img_to_show, (x, y), r, (0, 255, 0), 4)
-            cv2.putText(img_to_show, color + " circle", (x-r, y-r+5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
+            cv2.putText(img_to_show, color + " circle", ((int)(x-r/2), y-r+5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
             print(color + " circle")
 
 def find_triangle(image, img_to_show):
@@ -76,7 +76,6 @@ def find_triangle(image, img_to_show):
                 cv2.putText(img_to_show, "triangle", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
                 print("red triangle")
 
-
 def find_square(image, img_to_show):
 
     blurred = cv2.GaussianBlur(image, (15, 15), 0)
@@ -98,8 +97,22 @@ def find_square(image, img_to_show):
         peri = cv2.arcLength(c, True)
         approx = cv2.approxPolyDP(c, 0.02 * peri, True)
         if len(approx) == 4 and cv2.isContourConvex(approx) and image.shape[0] * image.shape[1] / math.fabs(cv2.contourArea(approx)) < 10000:
-            x = approx.ravel()[0]
-            y = approx.ravel()[1] - 5
-            cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
-            cv2.putText(img_to_show, "square", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
-            print("blue square")
+            maxCosine = 0
+            i = 2
+            while i < 5:
+                cosine = math.fabs(angle(approx[i % 4], approx[i - 2], approx[i - 1]))
+                maxCosine = max(cosine, maxCosine)
+                i += 1
+            if maxCosine < 0.3:
+                x = approx.ravel()[0]
+                y = approx.ravel()[1] - 5
+                cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
+                cv2.putText(img_to_show, "square", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
+                print("blue square")
+
+def angle(pt1, pt2, pt0):
+    dx1 = pt1[0][0] - pt0[0][0]
+    dy1 = pt1[0][1] - pt0[0][1]
+    dx2 = pt2[0][0] - pt0[0][0]
+    dy2 = pt2[0][1] - pt0[0][1]
+    return (dx1*dx2 + dy1*dy2)/math.sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10)
