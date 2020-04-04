@@ -1,8 +1,6 @@
-
-from shapedetector import ShapeDetector
 import argparse
 import cv2
-import imutils
+import math
 import numpy as np
 import traffic_sign_detection as traffic
 
@@ -35,7 +33,8 @@ def find_circle(img, img_to_show, color):
         circles = np.round(circles[0, :]).astype("int")
         for (x, y, r) in circles:
             cv2.circle(img_to_show, (x, y), r, (0, 255, 0), 4)
-            cv2.putText(img_to_show, color + " circle", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150, 150, 150), 2)
+            cv2.putText(img_to_show, color + " circle", (x-r, y-r+5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
+            print(color + " circle")
 
 def find_triangle(image, img_to_show):
 
@@ -64,24 +63,18 @@ def find_triangle(image, img_to_show):
     
     # finding contours
     canny = cv2.Canny(thresh, 100, 200)
-    cnts = cv2.findContours(canny.copy(), cv2.RETR_EXTERNAL,
-        cv2.CHAIN_APPROX_SIMPLE)
-    cnts = imutils.grab_contours(cnts)
+    cnts, _ = cv2.findContours(canny.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # loop over the contours
     for c in cnts:
-        M = cv2.moments(c)
-        if(M["m00"] != 0):
-            cX = int((M["m10"] / M["m00"]))
-            cY = int((M["m01"] / M["m00"]))
             peri = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.04 * peri, True)
-            if len(approx) == 3 and cv2.isContourConvex(approx):            
-            # multiply the contour (x, y)-coordinates by the resize ratio
-                c = c.astype("float")
-                c = c.astype("int")
+            if len(approx) == 3 and cv2.isContourConvex(approx) and image.shape[0] * image.shape[1] / math.fabs(cv2.contourArea(approx)) < 10000:
+                x = approx.ravel()[0]
+                y = approx.ravel()[1] + 2
                 cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
-                cv2.putText(img_to_show, "triangle", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150, 150, 150), 2)
+                cv2.putText(img_to_show, "triangle", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
+                print("red triangle")
 
 
 def find_square(image, img_to_show):
@@ -94,23 +87,19 @@ def find_square(image, img_to_show):
     result_blue = cv2.bitwise_and(image, image, mask=img_blue)
 
     gray = cv2.cvtColor(result_blue, cv2.COLOR_BGR2GRAY)
-    thresh = cv2.threshold(gray, 20,255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY)[1]
 
     # finding contours
     canny = cv2.Canny(thresh, 100, 200)
-    cnts = cv2.findContours(canny.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    cnts = imutils.grab_contours(cnts)
+    cnts, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # loop over the contours
     for c in cnts:
-        M = cv2.moments(c)
-        if(M["m00"] != 0):
-            cX = int((M["m10"] / M["m00"]))
-            cY = int((M["m01"] / M["m00"]))
-            peri = cv2.arcLength(c, True)
-            approx = cv2.approxPolyDP(c, 0.02 * peri, True)
-            if len(approx) == 4 and cv2.isContourConvex(approx):
-                c = c.astype("float")
-                c =  c.astype("int")
-                cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
-                cv2.putText(img_to_show, "square", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150, 150, 150), 2)
+        peri = cv2.arcLength(c, True)
+        approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+        if len(approx) == 4 and cv2.isContourConvex(approx) and image.shape[0] * image.shape[1] / math.fabs(cv2.contourArea(approx)) < 10000:
+            x = approx.ravel()[0]
+            y = approx.ravel()[1] - 5
+            cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
+            cv2.putText(img_to_show, "square", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
+            print("blue square")
