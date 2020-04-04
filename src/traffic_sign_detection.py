@@ -76,7 +76,7 @@ def find_triangle(image, img_to_show):
             cY = int((M["m01"] / M["m00"]))
             peri = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.04 * peri, True)
-            if len(approx) == 3:            
+            if len(approx) == 3 and cv2.isContourConvex(approx):            
             # multiply the contour (x, y)-coordinates by the resize ratio
                 c = c.astype("float")
                 c = c.astype("int")
@@ -109,7 +109,7 @@ def find_square(image, img_to_show):
             cY = int((M["m01"] / M["m00"]))
             peri = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.02 * peri, True)
-            if len(approx) == 4:
+            if len(approx) == 4 and cv2.isContourConvex(approx):
                 c = c.astype("float")
                 c =  c.astype("int")
                 cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
