@@ -12,6 +12,7 @@ img = None
 args = parser.parse_args()
 arg = args.method
 
+# get images from camera
 if arg == 'camera':
     cap = cv2.VideoCapture(0)
     img = None
@@ -27,6 +28,7 @@ if arg == 'camera':
     cap.release()
     cv2.destroyAllWindows()
 
+# open preacquired image
 elif arg == 'file':
     print('Opening image ' + args.path)
     img = cv2.imread(args.path)
