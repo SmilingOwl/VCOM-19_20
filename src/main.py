@@ -19,7 +19,7 @@ if arg == 'camera':
     while(True):
         ret, frame = cap.read()
         frame_to_show = frame.copy()
-        traffic.find_shapes(frame, frame)
+        traffic.find_shapes(frame, frame) # Find shapes
         cv2.imshow('Image', frame)
         key = cv2.waitKey(1)
         esc_key = 27
