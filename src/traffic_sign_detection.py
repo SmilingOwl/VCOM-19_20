@@ -4,7 +4,12 @@ import math
 import numpy as np
 import traffic_sign_detection as traffic
 
-# function to call each of the functions that detect the wanted classes
+"""
+Description: function to call each of the functions that detect the wanted classes.
+Attributes:
+    img: the image to be analysed.
+    img_to_show: the image to be shown with the detected signs.
+"""
 def find_shapes(img, img_to_show):
     find_circle(img, img_to_show, "red")
     find_circle(img, img_to_show, "blue")
@@ -12,7 +17,14 @@ def find_shapes(img, img_to_show):
     find_square(img, img_to_show)
     find_stop(img, img_to_show)
 
-# function to detect circles
+
+"""
+Description: function to detect circles.
+Attributes: 
+    img: the image to be analysed.
+    img_to_show: the image to be shown with the detected circles.
+    color: color of the circle we want to detect.
+"""
 def find_circle(img, img_to_show, color):
     # Segment image according to the color received as argument
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -52,11 +64,18 @@ def find_circle(img, img_to_show, color):
             cv2.putText(img_to_show, color + " circle", ((int)(x-r/2), y-r+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
             print(color + " circle")
 
-# function to detect red triangles
-def find_triangle(image, img_to_show):
+
+
+"""
+Description: function to detect red triangles.
+Attributes: 
+    img: the image to be analysed.
+    img_to_show: the image to be shown with the detected red triangles.
+"""
+def find_triangle(img, img_to_show):
 
     # Smoothing of the image
-    blurred = cv2.GaussianBlur(image, (15, 15), 0)
+    blurred = cv2.GaussianBlur(img, (15, 15), 0)
    
     # Converting to HSV color space in order to segment the image according to colors
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
@@ -74,7 +93,7 @@ def find_triangle(image, img_to_show):
     
     mask = mask1 + mask2
 
-    result_red = cv2.bitwise_and(image, image, mask = mask)
+    result_red = cv2.bitwise_and(img, img, mask = mask)
     
     gray = cv2.cvtColor(result_red, cv2.COLOR_BGR2GRAY)
     thresh = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
@@ -87,14 +106,20 @@ def find_triangle(image, img_to_show):
     for c in cnts:
             peri = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.04 * peri, True)
-            if len(approx) == 3 and cv2.isContourConvex(approx) and image.shape[0] * image.shape[1] / math.fabs(cv2.contourArea(approx)) < 10000:
+            if len(approx) == 3 and cv2.isContourConvex(approx) and img.shape[0] * img.shape[1] / math.fabs(cv2.contourArea(approx)) < 10000:
                 x = approx.ravel()[0]
                 y = approx.ravel()[1] + 2
                 cv2.drawContours(img_to_show, [c], -1, (0, 255, 0), 2)
                 cv2.putText(img_to_show, "red triangle", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
                 print("red triangle")
 
-# function to detect blue squares
+
+"""
+Description: function to detect blue squares
+Attributes: 
+    img: the image to be analysed.
+    img_to_show: the image to be shown with the detected blue squares/retangles.
+"""
 def find_square(image, img_to_show):
 
     # Smoothing of the image
@@ -132,7 +157,13 @@ def find_square(image, img_to_show):
                 cv2.putText(img_to_show, "blue square", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
                 print("blue square")
 
-# function to detect stop signs
+
+"""
+Description: function to detect stop signs.
+Attributes: 
+    img: the image to be analysed.
+    img_to_show: the image to be shown with the detected STOP sign.
+"""
 def find_stop(img, img_to_show):
 
     # Color Segmentation of Image
@@ -169,7 +200,15 @@ def find_stop(img, img_to_show):
                 cv2.putText(img_to_show, "STOP", (x, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 105, 0), 2)
                 print("STOP")
 
-# Auxiliary function to determine angles between lines
+
+"""
+Description: auxiliary function to determine angles between lines
+
+Attributes:
+    pt1: point to determine the angle.
+    pt2: point to determine the angle.
+    pt0: point to determine the angle.
+"""
 def angle(pt1, pt2, pt0):
     dx1 = pt1[0][0] - pt0[0][0]
     dy1 = pt1[0][1] - pt0[0][1]

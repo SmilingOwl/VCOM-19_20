@@ -9,6 +9,7 @@ parser.add_argument('method' ,help='\'camera\' or \'file\'', type=str)
 parser.add_argument('-i', '--image', dest='path', default='img.jpg',type=str)
 img = None
 
+# parse all the arguments received
 args = parser.parse_args()
 arg = args.method
 
@@ -19,14 +20,18 @@ if arg == 'camera':
     while(True):
         ret, frame = cap.read()
         frame_to_show = frame.copy()
-        traffic.find_shapes(frame, frame) # Find shapes
+       
+        # Find shapes
+        traffic.find_shapes(frame, frame) 
+       
         cv2.imshow('Image', frame)
         key = cv2.waitKey(1)
         esc_key = 27
         if key == esc_key:
             break
+
     cap.release()
-    cv2.destroyAllWindows()
+    cv2.destroyAllWindows() # to destroy all open windows
 
 # open preacquired image
 elif arg == 'file':
