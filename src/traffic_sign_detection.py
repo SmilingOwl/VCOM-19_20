@@ -134,21 +134,21 @@ def find_square(image, img_to_show):
 
 # function to detect stop signs
 def find_stop(img, img_to_show):
-    
-    # Smoothing of Image
-    blurred = cv2.GaussianBlur(img, (15, 15), 0)
 
     # Color Segmentation of Image
-    img_hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img_red1 = cv2.inRange(img_hsv, (0, 120, 70), (10, 255, 255))
-    img_red2 = cv2.inRange(img_hsv, (170, 120, 70), (180, 255, 255))
+    img_red2 = cv2.inRange(img_hsv, (170, 90, 70), (180, 255, 255))
     img_color = img_red1 + img_red2
     result_color = cv2.bitwise_and(img, img, mask=img_color)
     img_gray = cv2.cvtColor(result_color, cv2.COLOR_BGR2GRAY)
     thresh = cv2.threshold(img_gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 
+    # Smoothing of Image
+    blurred = cv2.GaussianBlur(thresh, (3, 3), 0)
+
     # Detect contours of objects in image
-    canny = cv2.Canny(thresh, 100, 200)
+    canny = cv2.Canny(blurred, 100, 200)
     contours, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # Analyse contours to find octogonal shapes
