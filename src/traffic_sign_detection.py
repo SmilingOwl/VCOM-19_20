@@ -18,7 +18,7 @@ def find_circle(img, img_to_show, color):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     if color == "red":
         img_red1 = cv2.inRange(img_hsv, (0, 190, 70), (10, 255, 255))
-        img_red2 = cv2.inRange(img_hsv, (170, 90, 70), (180, 255, 255))
+        img_red2 = cv2.inRange(img_hsv, (170, 90, 50), (180, 255, 255))
         img_color = img_red1 + img_red2
     else:
         img_color = cv2.inRange(img_hsv, (105, 150, 70), (130, 255, 255))
