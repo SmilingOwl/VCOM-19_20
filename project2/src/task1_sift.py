@@ -8,7 +8,12 @@ keys = {
     'malignant': 2,
 }
 
-def get_descriptors(train_img_path, train_data_path, detector):
+train_img_path = '../data/training/ISBI2016_ISIC_Part3_Training_Data'
+train_data_path = '../data/training/ISBI2016_ISIC_Part3_Training_GroundTruth.csv'
+test_img_path = '../data/test/ISBI2016_ISIC_Part3_Test_Data'
+test_data_path = '../data/test/ISBI2016_ISIC_Part3_Test_GroundTruth.csv'
+
+def get_descriptors(detector):
     labels = []
     all_descriptors = []
     with open(train_data_path) as csv_file:
@@ -26,7 +31,7 @@ def get_descriptors(train_img_path, train_data_path, detector):
             all_descriptors.extend(descriptors)
     return all_descriptors
 
-def train(bow_extractor, detector, train_data_path, train_img_path):
+def train(bow_extractor, detector):
     print('Training...')
     svm = cv2.ml.SVM_create()
     svm.setType(cv2.ml.SVM_C_SVC)
@@ -52,9 +57,9 @@ def train(bow_extractor, detector, train_data_path, train_img_path):
     svm.train(np.array(img_descriptors), cv2.ml.ROW_SAMPLE, np.array(img_labels))
     return svm
 
-def test(bow_extractor, svm, test_img_path, test_data_path, detector):
+def test(bow_extractor, svm, detector):
     print('Testing...')
-    img = cv2.imread(test_img_path + '/ISIC_0000000.jpg', 0)
+    img = cv2.imread(test_img_path + '/ISIC_0000003.jpg', 0)
     img = imutils.resize(img, width=512)
     keypoints, descriptors = detector.detectAndCompute(img, None)
     bows = []
@@ -62,15 +67,12 @@ def test(bow_extractor, svm, test_img_path, test_data_path, detector):
     pred = np.squeeze(svm.predict(np.array(bows))[1].astype(int))
     if pred == 1:
         print('benign')
-    else
+    else:
         print('malignant')
 
 def main():
-    train_img_path = '../data/training/ISBI2016_ISIC_Part3_Training_Data'
-    train_data_path = '../data/training/ISBI2016_ISIC_Part3_Training_GroundTruth.csv'
-    test_img_path = '../data/training/ISBI2016_ISIC_Part3_Test_Data'
     detector = cv2.xfeatures2d.SIFT_create()
-    all_descriptors = np.array(get_descriptors(train_img_path, train_data_path, detector))
+    all_descriptors = np.array(get_descriptors(detector))
     print('kmeans')
     bow_trainer = cv2.BOWKMeansTrainer(20)
     print('matcher')
@@ -79,7 +81,7 @@ def main():
     bow_extractor = cv2.BOWImgDescriptorExtractor(detector, matcher)
     print('cluster')
     bow_extractor.setVocabulary(bow_trainer.cluster(all_descriptors))
-    svm = train(bow_extractor, detector, train_data_path, train_img_path)
-    test(bow_extractor, svm, train_img_path, train_data_path, detector)
+    svm = train(bow_extractor, detector)
+    test(bow_extractor, svm, detector)
 
 main()
