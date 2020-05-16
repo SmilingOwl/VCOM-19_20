@@ -23,7 +23,6 @@ def get_descriptors(detector):
             img = cv2.imread(train_img_path + '/' + row[0] + '.jpg', 0) # read image as grayscale
             if img is None:
                 continue
-            img = imutils.resize(img, width=512)
             keypoints, descriptors = detector.detectAndCompute(img, None) # compute descriptors and keypoints
             if descriptors is None:
                 print('none')
@@ -46,7 +45,6 @@ def train(bow_extractor, detector):
             img = cv2.imread(train_img_path + '/' + row[0] + '.jpg', 0) # read image as grayscale
             if img is None:
                 continue
-            img = imutils.resize(img, width=512)
             keypoints, descriptors = detector.detectAndCompute(img, None) # compute descriptors and keypoints
             descriptor = bow_extractor.compute(img, keypoints)
             if descriptor is None:
@@ -59,7 +57,7 @@ def train(bow_extractor, detector):
 
 def test(bow_extractor, svm, detector):
     print('Testing...')
-    img = cv2.imread(test_img_path + '/ISIC_0000003.jpg', 0)
+    img = cv2.imread(test_img_path + '/ISIC_0000036.jpg', 0)
     img = imutils.resize(img, width=512)
     keypoints, descriptors = detector.detectAndCompute(img, None)
     bows = []
