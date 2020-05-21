@@ -6,6 +6,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Feature detection")
 parser.add_argument('-d', '--descriptors', default=False, dest='read_desc', action='store_true')
+parser.add_argument('-b', '--bow', default=False, dest='read_bow', action='store_true')
 parser.add_argument('-t', '--train', default=False, dest='read_svm', action='store_true')
 args = parser.parse_args()
 
@@ -45,7 +46,7 @@ def train(bow_extractor, detector):
     print('Training...')
     svm = cv2.ml.SVM_create()
     svm.setType(cv2.ml.SVM_C_SVC)
-    svm.setKernel(cv2.ml.SVM_LINEAR)
+    svm.setKernel(cv2.ml.SVM_RBF)
     svm.setTermCriteria((cv2.TERM_CRITERIA_MAX_ITER, 100, 1e-6))
     img_labels = []
     img_descriptors = []
@@ -91,7 +92,6 @@ def test(bow_extractor, svm, detector):
                     malignant_wrong += 1
             total += 1
     print('Total: ' + str(total))
-    print('Right: ' + str(right))
     print('Malignant correctly identified: ' + str(malignant_right))
     print('Benign correctly identified: ' + str(benign_right))
     print('Malignant identified as benign: ' + str(benign_wrong))
@@ -101,10 +101,19 @@ def test(bow_extractor, svm, detector):
 def main():
     detector = cv2.xfeatures2d.SIFT_create()
     all_descriptors = np.array(get_descriptors(detector))
-    bow_trainer = cv2.BOWKMeansTrainer(30)
+    if args.read_bow:
+        print('Loading bag of words...')
+        with open('../data/feature_detection/bow.pkl', 'rb') as inputfile:
+            bow_cluster = pickle.load(inputfile)
+    else:
+        print('Training Bag of Words...')
+        bow_trainer = cv2.BOWKMeansTrainer(300)
+        bow_cluster = bow_trainer.cluster(all_descriptors)
+        with open('../data/feature_detection/bow.pkl', 'wb') as outputfile:
+            pickle.dump(bow_cluster, outputfile)
     matcher = cv2.FlannBasedMatcher()
     bow_extractor = cv2.BOWImgDescriptorExtractor(detector, matcher)
-    bow_extractor.setVocabulary(bow_trainer.cluster(all_descriptors))
+    bow_extractor.setVocabulary(bow_cluster)
     svm = train(bow_extractor, detector)
     test(bow_extractor, svm, detector)
 
