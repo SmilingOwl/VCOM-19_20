@@ -3,6 +3,37 @@ import tensorflow as tf
 from tensorflow import keras
 from keras.layers.merge import add, concatenate
 from keras.layers import Conv2D, Input, BatchNormalization, LeakyReLU, ZeroPadding2D, UpSampling2D
+from keras.preprocessing.image import ImageDataGenerator
+
+train_datagen = ImageDataGenerator(
+      rescale=1./255,
+      rotation_range=20,
+      width_shift_range=0.2,
+      height_shift_range=0.2,
+      horizontal_flip=True,
+      fill_mode='nearest')
+
+validation_datagen = ImageDataGenerator(rescale=1./255)
+
+train_batchsize = 64
+val_batchsize = 134
+
+train_generator = train_datagen.flow_from_directory(
+        directory="../Data/Train",
+        target_size=(224, 224),
+        batch_size=train_batchsize,
+        class_mode='binary', 
+        shuffle=True,
+        seed=42)
+
+validation_generator = validation_datagen.flow_from_directory(
+        directory="/Data/Valid",
+        target_size=(224, 224),
+        batch_size=val_batchsize,
+        class_mode='binary',
+        shuffle=False, 
+        seed=42)
+
 
 def create_unet_model():
     inputs = Input(shape=(None,None,1))
