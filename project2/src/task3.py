@@ -5,13 +5,13 @@ from tensorflow import keras
 from keras.layers.merge import add, concatenate
 from keras.layers import Conv2D, Conv2DTranspose, Dropout, Input, UpSampling2D, MaxPooling2D, Concatenate
 from keras.models import Model
-from keras.metrics import BinaryAccuracy, Precision, Recall, AUC, TruePositives, FalsePositives, MeanIoU, TrueNegatives, FalseNegatives
+from keras.metrics import Accuracy, BinaryAccuracy, Precision, Recall, AUC, TruePositives, FalsePositives, MeanIoU, TrueNegatives, FalseNegatives
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.losses import BinaryCrossentropy
 from keras.optimizers import Adam
+from keras import backend as K
 import matplotlib.pyplot as plt
-
 
 def obtain_train_generator():
   train_datagen = ImageDataGenerator(
@@ -22,7 +22,7 @@ def obtain_train_generator():
     horizontal_flip=True,
     fill_mode='nearest'
   )
-  batchsize = 64
+  batchsize = 80
   train_generator = train_datagen.flow_from_directory(
     directory="/content/Dataset/training",
     classes = ['ISBI2016_ISIC_Part2B_Training_Data'],
@@ -62,7 +62,7 @@ def obtain_validation_generator():
     horizontal_flip=True,
     fill_mode='nearest'
   )
-  batchsize = 167
+  batchsize = 1
   valid_generator = valid_datagen.flow_from_directory(
     directory="/content/Dataset/validation",
     classes = ['data'],
@@ -70,7 +70,7 @@ def obtain_validation_generator():
     batch_size=batchsize,
     color_mode="rgb",
     class_mode = None,
-    shuffle=True
+    shuffle=False
   )
 
   masks_datagen = ImageDataGenerator(
@@ -140,6 +140,18 @@ def obtain_test_generator_without_masks():
   )
   return test_generator
 
+def dice_loss(y_true, y_pred):
+  return 1-dice_coef(y_true, y_pred)
+
+def dice_coef(y_true, y_pred, smooth=1):
+  intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
+  return (2. * intersection + smooth) / (K.sum(K.square(y_true),-1) + K.sum(K.square(y_pred),-1) + smooth)
+
+def jaccard_loss(y_true, y_pred, smooth=1):
+  intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
+  sum_ = K.sum(K.abs(y_true) + K.abs(y_pred), axis=-1)
+  jac = (intersection + smooth) / (sum_ - intersection + smooth)
+  return (1 - jac) * smooth
 
 def create_unet_model():
   inputs = Input(shape=(128, 128, 3))
@@ -193,11 +205,12 @@ def create_unet_model():
     FalsePositives(name='fp'),
     TrueNegatives(name='tn'),
     FalseNegatives(name='fn'),
-    MeanIoU(name='iou', num_classes=2)
+    MeanIoU(name='iou', num_classes=2),
+    dice_coef
   ]
   
   model.compile(
-      optimizer=Adam(lr=0.001),
+      optimizer=Adam(lr=3e-5),
       loss='binary_crossentropy',
       metrics=metrics
   )
@@ -208,15 +221,14 @@ def create_unet_model():
 
 model = create_unet_model()
 
-EPOCHS = 4
+EPOCHS = 5
 checkpoint = ModelCheckpoint('unet.hdf5', monitor='val_loss', verbose=1, save_best_only=True)
 train_generator = obtain_train_generator()
 validation_generator = obtain_validation_generator()
-
 model_history = model.fit_generator(
     train_generator, epochs=EPOCHS,
-    steps_per_epoch=10,
-    validation_steps=1,
+    steps_per_epoch=8,
+    validation_steps=167,
     validation_data=validation_generator,
     callbacks=[checkpoint],
     verbose=1,
@@ -243,13 +255,10 @@ plt.show()
 test_generator = obtain_test_generator()
 #results = model.predict_generator(obtain_test_generator_without_masks(), steps=335, verbose=1)
 results = model.evaluate(test_generator, steps=335)
-print("Loss: " + results[0])
-print("Accuracy: " + results[1])
-print("Precision: " + results[2])
-print("Recall: " + results[3])
-print("TP: " + results[4])
-print("FP: " + results[5])
-print("TN: " + results[6])
-print("FN: " + results[7])
-print("IOU: " + results[8])
+print("Loss: " + str(results[0]))
+print("Accuracy: " + str(results[1]))
+print("Precision: " + str(results[2]))
+print("Recall: " + str(results[3]))
+print("TP: " + str(results[4]))
+print("FP: " + str(results[5]))
 
