@@ -15,11 +15,12 @@ keys = {
     'malignant': 1,
 }
 
-train_img_path = '../data/training/ISBI2016_ISIC_Part3_Training_Data'
-train_data_path = '../data/training/ISBI2016_ISIC_Part3_Training_GroundTruth.csv'
-test_img_path = '../data/test/ISBI2016_ISIC_Part3_Test_Data'
-test_data_path = '../data/test/ISBI2016_ISIC_Part3_Test_GroundTruth.csv'
+train_img_path = '../data/task1/training/ISBI2016_ISIC_Part3_Training_Data'
+train_data_path = '../data/task1/training/ISBI2016_ISIC_Part3_Training_GroundTruth.csv'
+test_img_path = '../data/task1/test/ISBI2016_ISIC_Part3_Test_Data'
+test_data_path = '../data/task1/test/ISBI2016_ISIC_Part3_Test_GroundTruth.csv'
 
+# Get descriptors using sift
 def get_descriptors(detector):
     if args.read_desc:
         print('Loading descriptors...')
@@ -39,6 +40,7 @@ def get_descriptors(detector):
         pickle.dump(all_descriptors, outputfile)
     return all_descriptors
 
+# Train SVM classifier
 def train(bow_extractor, detector):
     if args.read_svm:
         print('Loading trained svm...')
@@ -62,6 +64,7 @@ def train(bow_extractor, detector):
     svm.save('../data/feature_detection/svm.pkl')
     return svm
 
+# Use SVM classifier on test dataset
 def test(bow_extractor, svm, detector):
     print('Testing...')
     total = 0
@@ -99,8 +102,11 @@ def test(bow_extractor, svm, detector):
     print('Accuracy: ' + str(float(right) / float(total)))
 
 def main():
+    # create feature detector with SIFT
     detector = cv2.xfeatures2d.SIFT_create()
+    # obtain descriptors
     all_descriptors = np.array(get_descriptors(detector))
+    # create or load bow
     if args.read_bow:
         print('Loading bag of words...')
         with open('../data/feature_detection/bow.pkl', 'rb') as inputfile:
@@ -114,7 +120,9 @@ def main():
     matcher = cv2.FlannBasedMatcher()
     bow_extractor = cv2.BOWImgDescriptorExtractor(detector, matcher)
     bow_extractor.setVocabulary(bow_cluster)
+    # obtain svm classifier
     svm = train(bow_extractor, detector)
+    # use classifier on test dataset
     test(bow_extractor, svm, detector)
 
 main()
