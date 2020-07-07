@@ -25,6 +25,16 @@ It also reduced the number of false circles identified in the image.
 
 The system identifies multiple road signs, STOP signs, some poorly illuminated signs, partially occluded signs when it comes to circles and also slanted signs.
 
+In this image, there is an example of the whole process for the detection of a triangular road sign:
+
+![](https://github.com/SmilingOwl/VCOM-19_20/blob/master/img/triangle%20detection%20process.JPG)
+
+In this image we have an example of the detection of 2 red circles that are badly illuminated and partially occluded:
+
+![](https://github.com/SmilingOwl/VCOM-19_20/blob/master/img/circle%20detection.JPG)
+
+For a more detailed overview of the project, please check the respective report [here](https://github.com/SmilingOwl/VCOM-19_20/blob/master/project1/docs/VCOM-report.pdf).
+
 ## Project 2: Classification and Segmentation of Skin Lesions
 
 This project had 3 tasks:
@@ -49,3 +59,5 @@ For this task, we used the VGG-16 architecture which resulted in the best result
 
 For this task, we used a UNET architecture to achieve segmentation, using Batch Normalization in the contraction path to increase the stability of the network, and with different
  loss functions, that we compared and arrived at the conclusion that Dice loss worked the best for our data sets.
+
+For a more detailed overview of this project, check the respective article [here](https://github.com/SmilingOwl/VCOM-19_20/blob/master/project2/docs/Report.pdf).
